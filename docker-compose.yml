@@ -1,0 +1,7 @@
+version: "3.9"
+services:
+  app:
+    image: alfabank
+    container_name: alfabank
+    ports:
+      - 127.0.0.1:8181:8080
