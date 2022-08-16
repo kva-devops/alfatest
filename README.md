@@ -1,43 +1,42 @@
-# Приложение Alfabank
+# Application "Alfabank"
 
-## О проекте 
-#### Описание
-REST-сервис для определения разницы в курсах валют за определенный промежуток времени. 
-В зависимости от того стал ли курс по отношению к базовой валюте (по умолчанию - USD) за сегодня выше или ниже
-вчерашнего - приложение показывает GIF-картинку, соответствующей тематики.
+## About project 
+#### Desc
+REST service for determining the difference in exchange rates for a certain period.
+Depending on whether the exchange rate against the base currency (by default - USD) has become higher or lower today
+yesterday - the application shows a GIF-picture corresponding to the topic.
 Сервис использует в своей работе следующие API:
+Service uses this API in its work:
  - https://docs.openexchangerates.org/docs/api-introduction
  - https://developers.giphy.com/docs/api#quick-start-guide
  
 
-#### Технологии
+#### Technologies
  > Java 11+, Gradle, Spring (Boot, Cloud), Lombok, Junit, Log4j, Docker, REST
 
-## Предварительная настройка файла конфигурации
-1. Скачать файлы репозитория и перейти в корень проекта
-2. Открыть файл настроек: `src/main/resources/application.properties`
-3. Задать следующие параметры:
-`rates.date.today=2022-06-06` - сегодняшняя дата
-`rates.date.yesterday=2022-06-05` - вчерашняя дата
-`rates.base=USD` - базовая валюта относительно которой будет происходить сравнение 
-4. Список всех доступных валют можно посмотреть здесь: https://openexchangerates.org/api/currencies.json
+## Init
+1. Downloads repository files and go to the root of the project.
+2. Open properties file: `src/main/resources/application.properties`
+3. Set the following options:
+`rates.date.today=2022-06-06` - today's date
+`rates.date.yesterday=2022-06-05` - yesterday's date
+`rates.base=USD` - the base currency against which the comparison will take place 
+4. A list of all available currencies you can be found here: https://openexchangerates.org/api/currencies.json
 
-## Сборка
-1. Находясь в корне проекта, выполнить сборку проекта: `gradle clean build`
+## Build
+1. From the root of the project, build it: `gradle clean build`
 
-## Запуск локально
-1. Находясь в корне проекта, выполнить запуск проекта: `java -jar build/libs/alfabank-0.0.1-SNAPSHOT.jar`
-2. Перейти на страницу: `localhost:8080/profit/currencies/RUB/analyze`, где `RUB` можно заменить на любую валюту из списка
+## Local work
+1. From the root of the project, run the project: `java -jar build/libs/alfabank-0.0.1-SNAPSHOT.jar`
+2. Go to the page: `localhost:8080/profit/currencies/RUB/analyze`, where `RUB` can be replaced with any currency from the list
 
-## Запуск через Docker Compose
-1. Находясь в корне проекта, собрать docker-образ командой: `docker build -t alfabank .`
-2. В файле docker-compose.yml настроить коммутацию портов (по умолчанию 8181:8080)
-3. Запустить контейнер командой `docker-compose up`
-4. Перейти на страницу: `localhost:8181/profit/currencies/RUB/analyze`, где `RUB` можно заменить на любую валюту из списка
+## Docker Compose work
+1. Being in the root of the project, build the docker image with the command: `docker build -t alfabank .`
+2. Set up port switching in the docker-compose.yml file (default 8181:8080)
+3. Start the container with the command `docker-compose up`
+4. Go to the page: `localhost:8181/profit/currencies/RUB/analyze`, where `RUB` can be replaced by any currency from the list
 
-## Контакты
-Кутявин Владимир Анатольевич
-
-email: vldmrqst@gmail.com
+## Contact
+Kutiavin Vladimir
 
 telegram: @kutiavinvladimir

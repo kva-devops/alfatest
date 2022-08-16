@@ -1,17 +1,16 @@
 package com.example.alfabank.service;
 
-import com.example.alfabank.api.*;
 import com.example.alfabank.models.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,40 +20,38 @@ import java.util.UUID;
 @Component
 @Slf4j
 public class AnalysisService {
-    /**
-     * instance of Feign-client interface for getting JsonNode object with currency rates of today
-     */
+
     @Autowired
-    private ExchangeRatesOfToday exchangeRatesOfToday;
+    private RestTemplate restTemplate;
+
+    @Value("${rates.id}")
+    private String ratesApiKey;
+
+    @Value("${rates.base}")
+    private String ratesBaseCurrency;
 
     /**
-     * instance of Feign-client interface for getting JsonNode object with currency rates of yesterday
+     * URL for getting gif-picture with tag: "RICH"
      */
-    @Autowired
-    private ExchangeRatesOfYesterday exchangeRatesOfYesterday;
+    @Value("${giphy.url.rich}")
+    private String giphyUrlRich;
 
     /**
-     * instance of Feign-client interface for getting JsonNode object all currencies
+     * URL for getting gif-picture with tag: "BROKE"
      */
-    @Autowired
-    private AllCurrencies allCurrencies;
+    @Value("${giphy.url.broke}")
+    private String giphyUrlBroke;
 
     /**
-     * instance of Feign-client interface for getting JsonNode-object containing random GIF image with tag: 'broke'
+     * URL for getting history of rates
      */
-    @Autowired
-    private GiphyBrokeRandom giphyBroke;
-
-    /**
-     * instance of Feign-client interface for getting JsonNode-object containing random GIF image with tag: 'rich'
-     */
-    @Autowired
-    private GiphyRichRandom giphyRich;
+    @Value("${rates.url.historical}")
+    private String ratesUrlHistorical;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Мethod for obtaining an url of GIF-object depending on the dynamics of the exchange rate
+     * Method for obtaining an url of GIF-object depending on the dynamics of the exchange rate
      * @param currencyCode three-character alphabetic string, denoting the currency whose rate dynamics we want to get
      * @return ResponseEntity object containing a string in html format with an GIF image
      * @throws Exception
@@ -67,15 +64,21 @@ public class AnalysisService {
             throw new IllegalArgumentException("The format of the 'currencyCode' is incorrect. "
                     + "Please contact technical support with the 'anchor'. anchor: " + anchor);
         }
-        JsonNode ratesOfToday = exchangeRatesOfToday.getRates();
-        JsonNode ratesOfYesterday = exchangeRatesOfYesterday.getRates();
+        String ratesTodayUrl = ratesUrlHistorical + LocalDate.now() + ".json?app_id=" + ratesApiKey + "&base=" + ratesBaseCurrency;
+        String ratesYesterdayUrl = ratesUrlHistorical + LocalDate.now().minusDays(1L) + ".json?app_id=" + ratesApiKey + "&base=" + ratesBaseCurrency;
+        System.out.println(ratesTodayUrl);
+        System.out.println(ratesYesterdayUrl);
+        JsonNode ratesOfToday = restTemplate.exchange(ratesTodayUrl, HttpMethod.GET, null, JsonNode.class).getBody();
+        JsonNode ratesOfYesterday = restTemplate.exchange(ratesYesterdayUrl, HttpMethod.GET, null, JsonNode.class).getBody();
         if (ratesOfToday == null || ratesOfYesterday == null) {
             log.warn("AnalysisService.showCorrespondingGif() request to API 'https://openexchangerates.org/api/historical/:date.json' returned null. "
                     + "Actual values: anchor='{}'", anchor);
             throw new Exception("An internal error has occurred. Please try again later or contact technical support with the 'anchor'. anchor: " + anchor);
         }
+        JsonNode giphyRich = restTemplate.exchange(giphyUrlRich, HttpMethod.GET, null, JsonNode.class).getBody();
+        JsonNode giphyBroke = restTemplate.exchange(giphyUrlBroke, HttpMethod.GET, null, JsonNode.class).getBody();;
         String urlGif = isRich(ratesOfToday, ratesOfYesterday, currencyCode) ?
-                getGifUrl(giphyRich.getGiphyObject()) : getGifUrl(giphyBroke.getGiphyObject());
+                getGifUrl(giphyRich) : getGifUrl(giphyBroke);
         String content = "<html><body><img src='" + urlGif + "'></body></html>";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.TEXT_HTML);
@@ -93,7 +96,8 @@ public class AnalysisService {
         if (code == null || code.length() != 3) {
             return false;
         }
-        HashMap<String, String> allCurrenciesMap = allCurrencies.getAllCurrencies();
+        JsonNode allCurrenciesJsonNode = restTemplate.exchange("https://openexchangerates.org/api/currencies.json", HttpMethod.GET, null, JsonNode.class).getBody();
+        Currencies allCurrenciesMap = mapper.treeToValue(allCurrenciesJsonNode, Currencies.class);
         if (allCurrenciesMap == null) {
             log.warn("AnalysisService.showCorrespondingGif() -> validCurrencyCode(currencyCode) request to API 'https://openexchangerates.org/api/currencies.json' returned null. "
                     + "Actual values: anchor='{}'", anchor);

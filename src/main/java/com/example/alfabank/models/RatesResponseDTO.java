@@ -1,6 +1,8 @@
 package com.example.alfabank.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -10,6 +12,8 @@ import java.util.HashMap;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class RatesResponseDTO {
     private String disclaimer;
     private String license;
@@ -17,14 +21,4 @@ public class RatesResponseDTO {
     private String base;
     private HashMap<String, Float> rates;
 
-    public RatesResponseDTO() {
-    }
-
-    public RatesResponseDTO(String disclaimer, String license, long timestamp, String base, HashMap<String, Float> rates) {
-        this.disclaimer = disclaimer;
-        this.license = license;
-        this.timestamp = timestamp;
-        this.base = base;
-        this.rates = rates;
-    }
 }

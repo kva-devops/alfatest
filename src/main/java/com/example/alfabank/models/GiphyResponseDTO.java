@@ -1,6 +1,7 @@
 package com.example.alfabank.models;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashMap;
@@ -10,10 +11,8 @@ import java.util.HashMap;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class GiphyResponseDTO {
     private HashMap<String, Object> data;
     private MetaInfoResponseDTO meta;
-
-    public GiphyResponseDTO() {
-    }
 }

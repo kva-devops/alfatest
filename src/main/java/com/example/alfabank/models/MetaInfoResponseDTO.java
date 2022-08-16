@@ -1,6 +1,8 @@
 package com.example.alfabank.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -8,17 +10,10 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class MetaInfoResponseDTO {
     private String msg;
     private int status;
     private String response_id;
-
-    public MetaInfoResponseDTO() {
-    }
-
-    public MetaInfoResponseDTO(String msg, int status, String response_id) {
-        this.msg = msg;
-        this.status = status;
-        this.response_id = response_id;
-    }
 }
